@@ -8,3 +8,10 @@ js的学习笔记
 ### js设计模式
 
 目录  `design_pattern`
+
+项目启动方式
+
+```
+npm run dev
+```
+
