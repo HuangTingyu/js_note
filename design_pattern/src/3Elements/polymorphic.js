@@ -1,6 +1,6 @@
 class People {
     constructor(name) {
-        this.name
+        this.name = name
     }
     say() {
         console.log('hi')
