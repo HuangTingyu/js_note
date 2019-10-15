@@ -11,8 +11,16 @@
 <body>
     <div id="div1">sbwf</div>
     <script>
+        // var getId = document.getElementById;
+        // getId('div1')
+        document.getElementById = (function(func) {
+            return function() {
+                return func.apply(document, arguments)
+            }
+        })(document.getElementById)
         var getId = document.getElementById;
-        getId('div1')
+        var div = getId('div1')
+        console.log(div.id)
     </script>
 </body>
 

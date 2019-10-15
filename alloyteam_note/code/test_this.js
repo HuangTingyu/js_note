@@ -18,5 +18,6 @@ var obj = {
     }
 }
 console.log(obj.getName())
+
 var getName2 = obj.getName
 console.log(getName2())
