@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>judgeType</title>
+</head>
+
+<body>
+    <script>
+        var getSingle = function(fn) {
+            var ret;
+            return function() {
+                return ret || (ret = fn.apply(this, arguments))
+            }
+        }
+        var getScript = getSingle(function() {
+            console.log('script')
+            return document.createElement('script')
+
+        })
+        var script1 = getScript();
+        var script2 = getScript();
+        console.log(script1 === script2);
+    </script>
+</body>
+
+</html>

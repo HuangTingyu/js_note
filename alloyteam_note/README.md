@@ -1,5 +1,5 @@
 ## 目录
 
-duck.md介绍了多态的用法
+duck.md —— 介绍了多态的用法
 
-this_note.md介绍了this相关的内容
+closure.md —— 介绍了闭包相关的内容
