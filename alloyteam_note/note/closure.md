@@ -73,6 +73,45 @@ document.getElementById = (function(func) {
 
 `func.apply(document, arguments)` 相当于document调用了，document.getElementById(arguments)
 
+### call,apply的应用
+
+代码参考 —— `call_test.js`
+
+1.修正this的指向
+
+例子1 ——
+
+```js
+var obj1 = {
+    name: 'bacra'
+}
+var obj2 = {
+    name: 'sakura'
+}
+global.name = 'global'
+var getName = function() {
+    console.log(this.name)
+}
+getName()
+getName.call(obj1)
+getName.call(obj2)
+```
+
+`getName.call(obj2)` 相当于，把getName函数里面的this指向了obj2
+
+例子2 ——
+
+在onclick事件里面，this是指向document创建的div的。但是，在函数func里面，this将指向window。因此，借助call，将func中this的指向修正为div。
+
+```js
+document.getElementById('div').onclick = function() {
+    var func = function() {
+        console.log(this.id)
+    }
+    func.call(this)
+}
+```
+
 ## 闭包
 
 详见 `closure.js` 以及 `closure.html`
