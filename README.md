@@ -15,3 +15,10 @@ js的学习笔记
 npm run dev
 ```
 
+## 读书笔记/代码练习
+
+### js设计模式与开发实践
+
+(腾讯前端团队 —— alloyteam)
+
+目录 `alloyteam_note`
