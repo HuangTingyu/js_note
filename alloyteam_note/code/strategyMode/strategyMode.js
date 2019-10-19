@@ -47,6 +47,15 @@ var Bonus = function() {
 Bonus.prototype.setSalary = function(salary) {
     this.salary = salary
 }
-Bonus.prototype.setStategy = function(strategy) {
+Bonus.prototype.setStrategy = function(strategy) {
     this.strategy = strategy
 }
+Bonus.prototype.getBonus = function() {
+    return this.strategy.calculate(this.salary)
+}
+var bonus = new Bonus()
+bonus.setSalary(1000)
+bonus.setStrategy(new performanceS())
+console.log(bonus.getBonus())
+bonus.setStrategy(new performanceA())
+console.log(bonus.getBonus())
