@@ -16,43 +16,43 @@
 // console.log(mult(1, 2, 3))
 //
 // 版本2——————————————————————
-// var mult = (function() {
-//     var cache = {}
-//     return function() {
-//         var args = Array.prototype.join.call(arguments, ',');
-//         if (args in cache) {
-//             return cache[args]
-//         }
-//         var a = 1;
-//         for (var i = 0, l = arguments.length; i < l; i++) {
-//             a = a * arguments[i]
-//         }
-//         return cache[args] = a
-//     }
-// })()
-// console.log(mult(1, 2, 3))
-// console.log(mult(1, 2, 3))
-//
-// 版本3————————————————————————
-// var mult = (function() {
-//     var cache = {}
-//     var calculate = function() {
-//         var a = 1;
-//         for (var i = 0, l = arguments.length; i < l; i++) {
-//             a = a * arguments[i]
-//         }
-//         return a
-//     }
-//     return function() {
-//         var args = Array.prototype.join.call(arguments, ',');
-//         if (args in cache) {
-//             return cache[args]
-//         }
-//         return cache[args] = calculate.apply(null, arguments)
-//     }
-// })()
-// console.log(mult(1, 2, 3))
-// console.log(mult(1, 2, 3))
+var mult = (function() {
+    var cache = {}
+    return function() {
+        var args = Array.prototype.join.call(arguments, ',');
+        if (args in cache) {
+            return cache[args]
+        }
+        var a = 1;
+        for (var i = 0, l = arguments.length; i < l; i++) {
+            a = a * arguments[i]
+        }
+        return cache[args] = a
+    }
+})()
+console.log(mult(1, 2, 3))
+console.log(mult(1, 2, 3))
+    //
+    // 版本3————————————————————————
+    // var mult = (function() {
+    //     var cache = {}
+    //     var calculate = function() {
+    //         var a = 1;
+    //         for (var i = 0, l = arguments.length; i < l; i++) {
+    //             a = a * arguments[i]
+    //         }
+    //         return a
+    //     }
+    //     return function() {
+    //         var args = Array.prototype.join.call(arguments, ',');
+    //         if (args in cache) {
+    //             return cache[args]
+    //         }
+    //         return cache[args] = calculate.apply(null, arguments)
+    //     }
+    // })()
+    // console.log(mult(1, 2, 3))
+    // console.log(mult(1, 2, 3))
 
 // 闭包与对象相互转化
 // 闭包

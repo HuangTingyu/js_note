@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>代理模式</title>
+</head>
+
+<body>
+    <script>
+        var myImage = (function() {
+                var imgNode = document.createElement('img')
+                document.body.appendChild(imgNode)
+                return {
+                    setSrc: function(src) {
+                        imgNode.src = src;
+                    }
+                }
+            })()
+            // myImage.setSrc('http://i0.hdslb.com/bfs/archive/1ee3febf53becf8ca9e84387c4578f1b41c354be.png')
+        var proxyImage = (function() {
+                var img = new Image;
+                img.onload = function() {
+                    myImage.setSrc(this.src)
+                }
+                return {
+                    setSrc: function(src) {
+                        myImage.setSrc('./loading-gif.gif')
+                        img.src = src;
+                    }
+                }
+            })()
+            // proxyImage.setSrc('http://i0.hdslb.com/bfs/archive/1ee3febf53becf8ca9e84387c4578f1b41c354be.png')
+            // 加载图片的简化版写法对比
+        var simplyImage = (function() {
+            var imgNode = document.createElement('img')
+            document.body.appendChild(imgNode)
+            var img = new Image;
+            img.onload = function() {
+                imgNode.src = this.src
+            }
+            return {
+                setSrc: function(src) {
+                    imgNode.src = './loading-gif.gif'
+                    img.src = src
+                }
+            }
+        })()
+        simplyImage.setSrc('http://i0.hdslb.com/bfs/archive/1ee3febf53becf8ca9e84387c4578f1b41c354be.png')
+    </script>
+</body>
+
+</html>
