@@ -12,3 +12,5 @@ stategyMode.md —— 策略模式
 
 proxyMode.md —— 代理模式
 
+iterator.js —— 迭代器
+
