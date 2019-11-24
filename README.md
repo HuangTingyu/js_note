@@ -17,8 +17,17 @@ npm run dev
 
 ## 读书笔记/代码练习
 
-### js设计模式与开发实践
+### alloyteam_note
 
 (腾讯前端团队 —— alloyteam)
 
-目录 `alloyteam_note`
+Javascript设计模式与开发实践
+
+### js_advanced_program
+
+js高级程序设计
+
+### uDonotKnowJS_note
+
+你不知道Javascript
+
