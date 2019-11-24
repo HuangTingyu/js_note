@@ -1,25 +1,8 @@
-var salesOffices = {} // 定义售楼处
-salesOffices.clientList = [] // 缓存列表
-salesOffices.listen = function(fn) {
-    this.clientList.push(fn)
-}
-salesOffices.trigger = function() {
-    for (var i = 0, fn; fn = this.clientList[i++];) {
-        fn.apply(this, arguments)
-    }
-}
-salesOffices.listen(function(price, squareMeter) {
-    console.log('价格=' + price)
-    console.log('squareMeter=' + squareMeter)
-})
-salesOffices.listen(function(price, squareMeter) {
-        console.log('价格=' + price)
-        console.log('squareMeter=' + squareMeter)
-    })
-    // salesOffices.trigger('200w', 88)
-    // salesOffices.trigger('1000w', 110)
+### 订阅者-发布者模式
 
-// 屏蔽110平方
+详细代码见 —— `code\announcer`
+
+```js
 var salesOffices = {}
 salesOffices.clientList = {}
 salesOffices.listen = function(key, fn) {
@@ -43,11 +26,20 @@ salesOffices.listen('squareMeter88', function(price) {
 })
 salesOffices.listen('squareMeter110', function(price) {
         console.log('价格=' + price)
-    })
-    // salesOffices.trigger('squareMeter88', '200w')
-    // salesOffices.trigger('squareMeter110', '1000w')
+    }
+salesOffices.trigger('squareMeter88', '200w')
+salesOffices.trigger('squareMeter110', '1000w')
+```
 
-// 添加动态职责
+解释 ——
+
+ `listen` 相当于，给 `squareMeter88` 绑定后面的 `function` ，`function` 可以是多个函数。
+
+`trigger` 相当于，触发 `squareMeter88` 绑定的 `function`
+
+### 批量注册 `订阅函数`
+
+```js
 var event = {
     clientList: [],
     listen: function(key, fn) {
@@ -74,16 +66,13 @@ var installEvent = function(obj) {
 }
 var salesOffices = {}
 installEvent(salesOffices)
-    // salesOffices.listen('squareMeter88', function(price) {
-    //     console.log('价格=' + price)
-    // })
-    // salesOffices.listen('squareMeter110', function(price) {
-    //         console.log('价格=' + price)
-    //     })
-    // salesOffices.trigger('squareMeter88', '200w')
-    // salesOffices.trigger('squareMeter110', '1000w')
+```
 
-// 取消订阅
+只要执行 `installEvent(salesOffices)` ，salesOffices就自动拥有上面的 `listen` 和 `trigger`
+
+### 取消订阅
+
+```js
 event.remove = function(key, fn) {
     var fns = this.clientList[key]
     if (!fns) {
@@ -100,12 +89,11 @@ event.remove = function(key, fn) {
         }
     }
 }
-var salesOffices = {}
-var installEvent = function(obj) {
-    for (var i in event) {
-        obj[i] = event[i]
-    }
-}
+```
+
+应用
+
+```js
 installEvent(salesOffices)
 salesOffices.listen('squareMeter88', fn1 = function(price) {
     console.log('fn1价格=' + price)
@@ -117,3 +105,9 @@ salesOffices.listen('squareMeter88', fn2 = function(price) {
 })
 salesOffices.remove('squareMeter88', fn1)
 salesOffices.trigger('squareMeter88', '1080w')
+```
+
+解绑`fn1` 之后，输出 ——
+
+fn2价格=1080w
+
