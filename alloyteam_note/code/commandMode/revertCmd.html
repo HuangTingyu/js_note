@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>回退命令</title>
+</head>
+
+<body>
+    <button id="replay">播放录像</button>
+    <script>
+        var Ryu = {
+            attack: function() {
+                console.log('attack')
+            },
+            defense: function() {
+                console.log('defense')
+            },
+            jump: function() {
+                console.log('jump')
+            },
+            crouch: function() {
+                console.log('crouch')
+            }
+
+        }
+        var makeCommand = function(receiver, state) {
+            return function() {
+                receiver[state]()
+            }
+        }
+        var commands = {
+            "119": "jump", //W
+            "115": 'crouch', // S
+            "97": "defense", // A
+            "100": "attack" // D
+        }
+        var commandStack = []
+        document.onkeypress = function(ev) {
+            var keyCode = ev.keyCode,
+                command = makeCommand(Ryu, commands[keyCode])
+            if (command) {
+                command()
+                commandStack.push(command)
+            }
+
+        }
+        document.getElementById('replay').onclick = function() {
+            var command
+            while (command = commandStack.shift()) {
+                command()
+            }
+        }
+    </script>
+</body>
+
+</html>
