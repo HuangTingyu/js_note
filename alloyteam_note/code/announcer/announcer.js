@@ -117,3 +117,26 @@ salesOffices.listen('squareMeter88', fn2 = function(price) {
 })
 salesOffices.remove('squareMeter88', fn1)
 salesOffices.trigger('squareMeter88', '1080w')
+
+// 网站登录
+login.succ(function(data) {
+    header.setAvatar(data.avatar) //设置header模块的头像
+    nav.setAvatar(data.avatar) // 设置导航模块的头像
+    message.refresh() // 刷新消息列表
+    cart.refresh() // 刷新购物车列表
+
+})
+
+$.ajax('http://xxx.com?login', function(data) {
+    login.trigger('loginSucc', data)
+})
+var header = (function() {
+    login.listen('loginSucc', function(data) {
+        address.refresh(obj)
+    })
+    return {
+        refresh: function(avatar) {
+            console.log('refresh')
+        }
+    }
+})()

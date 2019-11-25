@@ -5,11 +5,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <title>announcer</title>
 </head>
 
 <body>
-
+    <button id="count">click</button>
+    <div id="show"></div>
+    <script>
+        var a = (function() {
+            var count = 0
+            var button = document.getElementById('count')
+            button.onclick = function() {
+                Event.trigger('add', count++)
+            }
+        })()
+    </script>
 </body>
 
 </html>

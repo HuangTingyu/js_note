@@ -91,7 +91,7 @@ event.remove = function(key, fn) {
 }
 ```
 
-应用
+使用方法如下 ——
 
 ```js
 installEvent(salesOffices)
@@ -110,4 +110,39 @@ salesOffices.trigger('squareMeter88', '1080w')
 解绑`fn1` 之后，输出 ——
 
 fn2价格=1080w
+
+### 网站登录
+
+登录后要执行的操作，如果一直往login.succ里面添加函数，这个函数就会膨胀成一坨屎
+
+```js
+// 网站登录
+login.succ(function(data) {
+    header.setAvatar(data.avatar) //设置header模块的头像
+    nav.setAvatar(data.avatar) // 设置导航模块的头像
+    message.refresh() // 刷新消息列表
+    cart.refresh() // 刷新购物车列表
+
+})
+```
+
+使用订阅者-发布者模式，改写——
+
+
+
+```js
+$.ajax('http://xxx.com?login', function(data) {
+    login.trigger('loginSucc', data)
+})
+var header = (function() {
+    login.listen('loginSucc', function(data) {
+        address.refresh(obj)
+    })
+    return {
+        refresh: function(avatar) {
+            console.log('refresh')
+        }
+    }
+})()
+```
 
