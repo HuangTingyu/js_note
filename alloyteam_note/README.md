@@ -14,4 +14,7 @@ proxyMode.md —— 代理模式
 
 iterator.md —— 迭代器
 
-announcer.md —— 订阅者-发布者模式
+announcerMode.md —— 订阅者-发布者模式
+
+commandMode.md —— 命令模式
+
