@@ -128,8 +128,6 @@ login.succ(function(data) {
 
 使用订阅者-发布者模式，改写——
 
-
-
 ```js
 $.ajax('http://xxx.com?login', function(data) {
     login.trigger('loginSucc', data)

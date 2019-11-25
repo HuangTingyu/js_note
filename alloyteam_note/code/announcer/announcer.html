@@ -19,6 +19,12 @@
                 Event.trigger('add', count++)
             }
         })()
+        var b = (function() {
+            var div = document.getElementById('show')
+            Event.listen('add', function() {
+                div.innerHTML = count
+            })
+        })
     </script>
 </body>
 
