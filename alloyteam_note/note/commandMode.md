@@ -64,7 +64,7 @@ ps.这个写法没啥意义，如果要绑定 `click` 事件，可以直接添�
 
 点击 `moveBtn` 按钮的时候，会更新小球的 oldPos
 
-## 重做
+### 重做
 
 如果要撤销一系列命令，比如下了10步棋，要悔棋到第5步；比如在canvas画了一大堆的线，想要擦除并不是一件容易的事情。
 
@@ -115,3 +115,44 @@ ps.这个写法没啥意义，如果要绑定 `click` 事件，可以直接添�
         }
 ```
 
+### 宏命令
+
+宏命令是一组命令的集合，通过执行宏命令，可以一次执行一批命令。
+
+```js
+var closeDoorCommand = {
+    execute: function() {
+        console.log('关门')
+    }
+}
+var openPcCommand = {
+    execute: function() {
+        console.log('开电脑')
+    }
+}
+var openQQCommand = {
+    execute: function() {
+        console.log('登录QQ')
+    }
+}
+var MacroCommand = function() {
+    return {
+        commandsList: [],
+        add: function(command) {
+            this.commandsList.push(command)
+        },
+        execute: function() {
+            for (var i = 0, command; command = this.commandsList[i++];) {
+                command.execute()
+            }
+        }
+    }
+}
+var macroCommand = MacroCommand()
+macroCommand.add(closeDoorCommand)
+macroCommand.add(openPcCommand)
+macroCommand.add(openQQCommand)
+macroCommand.execute()
+```
+
+macroCommand.add，首先把要执行的命令全部push到 `commandList` 里面，然后macroCommand.execute()，再把队列里的命令依次执行。
