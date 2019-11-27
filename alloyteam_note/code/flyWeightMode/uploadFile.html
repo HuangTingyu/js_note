@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>享元模式</title>
+</head>
+
+<body>
+    <script>
+        var id = 0
+        window.sratrUpload = function(uploadType, files) {
+            // uploadType区分是控件还是flash
+            for (var i = 0, file; file = files[i++];) {
+                var uploadObj = new Upload(uploadType, file.fileName, file.fileSize)
+                uploadObj.init(id++) // 给upload对象设置唯一id
+                    // 当用户选择完文件之后，startUpload函数会遍历files数组创建upload对象。
+            }
+        }
+        var Upload = function(uploadType, fileName, fileSize) {
+            this.uploadType = uploadType;
+            this.fileName = fileName;
+            this.fileSize = fileSize;
+            this.dom = null;
+        }
+        Upload.prototype.init = function(id) {
+                var that = this;
+                this.id = id;
+                this.dom = document.createElement('div')
+                this.dom.innerHTML = '<span>文件名称:' + this.fileName + ',文件大小:' + this.fileSize + '</span><button class="delFile">删除</button>'
+                this.dom.querySelector('.delFile').onclick = function() {
+                    that.delFile()
+                }
+                document.body.appendChild(this.dom)
+            }
+            // 文件删除
+            // 当被删除的文件小于3000kb时，文件将被直接删除。
+            // 否则，页面会弹出一个提示框，提示是否删除该文件。
+        Upload.prototype.delFile = function() {}
+    </script>
+</body>
+
+</html>
