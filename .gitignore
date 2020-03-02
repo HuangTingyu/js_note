@@ -13,3 +13,4 @@ static/mock
 *.ntvs*
 *.njsproj
 *.sln
+*.log
