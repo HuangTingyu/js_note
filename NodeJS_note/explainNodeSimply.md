@@ -266,7 +266,61 @@ process.memoryUsage()
 }
 ```
 
-heapTotal是V8申请到的堆内存，heapUsed是使用的量。
+单位B，可以通过（/1024/1024）转为MB
+
+heapTotal是V8申请到的堆内存，heapUsed是堆内存的使用量，rss是进程常驻内存。
+
+一般来说，rss的值总是远大于heapTotal，因为Node的内存并非都是由V8分配的。
 
 ### 堆外内存
 
+Node中的内存并非都是V8分配的，不通过V8分配的称为堆外内存。比如Buffer对象。
+
+`code\garbageCollection.js`
+
+```js
+var useMem = function(fd){
+    var size = 200 * 1024 *1024
+    var buffer = new Buffer(size)
+    for(var i=0; i < size; i++){
+        buffer[i]=0
+        getRAM(fd)
+    }
+    return buffer;
+}
+
+var getRAM = function(fd){
+    var mem = process.memoryUsage();
+    var format = function(bytes) { 
+          return (bytes/1024/1024).toFixed(2)+'MB'; 
+    };
+    var ramStr = 'Process: heapTotal '+format(mem.heapTotal) + ' heapUsed ' + format(mem.heapUsed) + ' rss ' + format(mem.rss)
+    ramStr += '\n'
+    fs.writeFile(fd,ramStr,function(err){
+        if(err){
+            throw err;
+        }
+    })
+}
+
+const fs = require('fs')
+
+fs.open(__dirname + '/gc.log', 'a', function (err, fd) {
+    if(err){
+        throw err;
+    }
+    useMem(fd)
+    
+      
+})
+```
+
+运行代码，发现rss不断增长，远远突破了V8的内存限制。
+
+### 内存泄漏
+
+Node对内存泄漏十分敏感，当内存泄漏造成堆积，垃圾回收过程将耗费更多时间进行对象扫描，应用响应缓慢，直到进程内存溢出，应用崩溃。
+
+内存泄漏的情况不尽相同，实质只有一个，那就是应当回收的对象出现意外而没有回收。
+
+通常，造成内存泄漏的原因有如下。
