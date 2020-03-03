@@ -430,3 +430,65 @@ console.log(Buffer.isEncoding(''));
 // 打印: false
 ```
 
+对于不支持的编码类型，可以借Node生态圈的icon和iconv-lite两个模块可以支持更多的编码类型转换。
+
+iconv-lite采用纯js实现，iconv通过C++调用libiconv库完成，前者比后者更轻量。
+
+### Buffer拼接
+
+#### 乱码的产生
+
+Buffer的传输，此时我们限定每次从`test.md`读取到的Buffer长度为11
+
+结果出现了 —— `床前明��光，疑���地上霜`
+
+```js
+var fs = require('fs')
+var rs = fs.createReadStream('./asset/test.md', {highWaterMark: 11})
+var data = ''
+rs.on("data",function(chunk){
+    data += chunk
+})
+rs.on("end",function(){
+    console.log(data)
+})
+```
+
+对于任意长度的Buffer而言，宽字节都有可能存在被截断的情况。只不过Buffer长度越大，出现的概率越低。
+
+#### setEncoding处理乱码
+
+setEncoding能处理包括UTF-8、Base64 和 UCS-2/UTF-16LE 这3种编码的乱码问题。
+
+```
+var rs = fs.createReadStream('./asset/test.md', {highWaterMark: 11})
+rs.setEncoding('utf8')
+```
+
+调用setEncoding() 时，可读流内部设置了一个decoder对象。decoder对象来源于string_decoder模块StringDecoder的实例对象。
+
+解决乱码问题的思路是，将Buffer对象写入decoder中，StringDecoder得到编码后，知道宽字节字符串UTF-8编码下是以3个字节的方式存储的。对于 `床前明月光，疑是地上霜` 来说，第一次write() ，只输出前9个字节转码形成的字符，“月” 字前两个字节被保留在StringDecoder内部，第二次write() 时，会将2个剩余字节和后续11个字节组合在一起，再次用3的倍数进行转码。
+
+#### 另一种拼接思路
+
+如果不使用setEncoding() ，剩下的解决方案将多个小Buffer拼接成一个Buffer对象，然后通过iconv-lite一类的模块来转码。代码如下所示，
+
+```js
+var fs = require('fs')
+var iconv = require('iconv-lite')
+var rs = fs.createReadStream('./asset/test.md', {highWaterMark: 11})
+var data = ''
+var chunks = []
+var size = 0
+rs.on('data',function(chunk){
+    chunks.push(chunk)
+    size += chunk.length
+})
+rs.on('end',function(){
+    var buf = Buffer.concat(chunks,size)
+    var str = iconv.decode(buf,'utf8')
+    console.log(str)
+})
+```
+
+用一个数组存储接收到的所有Buffer片段，并记录下所有片段的总长度，然后用Buffer.concat() 生成一个合并的Buffer对象。
