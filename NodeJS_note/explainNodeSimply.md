@@ -361,3 +361,72 @@ reader.pipe(writer)
 
 通过流的方式，上述代码不会受到V8内存限制。
 
+## 6.buffer
+
+在Node中，应用需要处理网络协议、操作数据库、处理图片、接收上传文件等，在网络流和文件操作中，还要处理大量二进制数据，JS自有的对象不能满足这些需求，于是Buffer对象应运而生。
+
+Buffer虽然不会受到V8堆内存限制，物理内存仍有限制，大片使用内存的情况仍要小心。
+
+### Buffer对象
+
+Buffer对象的元素为16进制的两位数，即0到255的数值
+
+```
+var str = '深入浅出nodejs'
+var buf = Buffer.from(str, 'utf-8')
+console.log(buf)
+```
+
+输出结果 ——
+
+```
+<Buffer e6 b7 b1 e5 85 a5 e6 b5 85 e5 87 ba 6e 6f 64 65 6a 73>
+```
+
+### 内存分配
+
+Buffer对象的内存分配不是在V8堆内存中，而是在Node的C++层面实现内存申请的。
+
+如果需要一点内存就向操作系统申请一点，就可能造成大量内存申请的系统调用，对操作系统有一定压力。为了高效的使用申请来的内存，Node采用了slab分配机制。slab是一块申请好的固定大小的内存区域。
+
+### Buffer转换
+
+#### 1.字符串转Buffer
+
+可以通过 `Buffer.from(string[, encoding])`
+
+创建一个包含 `string` 的新 `Buffer`。 `encoding` 参数指定 `string` 的字符编码，默认值 `utf8`
+
+#### 2.Buffer转字符串
+
+`buf.toString([encoding[, start[, end]]])`
+
+- `encoding` 使用的字符编码，**默认值:** `'utf8'`
+- `start` 开始解码的字节偏移量，**默认值:** `0`
+- `end` 结束解码的字节偏移量（不包含），**默认值:** [`buf.length`]
+
+```
+var str = 'Dear-迪丽热巴'
+var buf = Buffer.from(str, 'utf-8')
+console.log(buf)
+console.log(buf.toString())
+```
+
+#### 3.判断Buffer支持的类型
+
+Buffer.isEncoding(encoding)
+
+```
+console.log(Buffer.isEncoding('utf-8'));
+// 打印: true
+
+console.log(Buffer.isEncoding('hex'));
+// 打印: true
+
+console.log(Buffer.isEncoding('utf/8'));
+// 打印: false
+
+console.log(Buffer.isEncoding(''));
+// 打印: false
+```
+
