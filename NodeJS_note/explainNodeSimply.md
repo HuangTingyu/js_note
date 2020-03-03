@@ -345,3 +345,19 @@ JS可以通过队列完成许多特殊需求，当队列的消费速度低于生
 
 node-heapdump，node-memwatch
 
+### 大内存应用
+
+Node提供了stream模块用于处理大文件。Node中大部分模块都有stream的应用，比如fs的createReadStream() 和createWriteStream()方法可以分别用于创建文件的可读流和可写流，process模块中的stdin和stdout则分别是可读流和可写流的示例。
+
+由于V8的内存限制，无法通过fs.readFile() 和 fs.writeFile() 直接进行大文件操作，而改用createReadStream() 和createWriteStream() 实现对大文件的操作。下述代码，可以把 `in.md` 的内容写入到 `out.md`
+
+`code\garbageCollection.js`
+
+```js
+var reader = fs.createReadStream('./asset/in.md')
+var writer = fs.createWriteStream('./asset/out.md')
+reader.pipe(writer)
+```
+
+通过流的方式，上述代码不会受到V8内存限制。
+
