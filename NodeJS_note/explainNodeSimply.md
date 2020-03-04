@@ -698,3 +698,48 @@ data事件 —— 接收到数据的时候触发该事件。
 
 socket.on('end', function(){}) —— 半关闭 socket。 例如发送一个 FIN 包。 服务端仍可以发送数据。
 
+### UDP服务
+
+TCP连接一旦建立，所有会话都基于连接完成，客户端如果要跟另一个TCP服务通信，需要另创一个套接字。
+
+UDP中，一个套接字可以与多个UDP服务通信。网络差的时候存在严重的丢包，常常应用在丢一两个包也不影响的场景，比如音频、视频等。UDP应用广泛，DNS服务就是基于它实现的。
+
+建立一个UDP服务
+
+`code\networkProgram\udpServer.js`
+
+```js
+var dgram = require('dgram')
+var server = dgram.createSocket('udp4')
+server.on("message",function(msg, rinfo){
+    console.log("sever got:" + msg + "from" + rinfo.address + ":" + rinfo.port)
+})
+server.on("listening", function(){
+    var address = server.address()
+    console.log("server listening" + address.address + ":" + address.port)
+})
+server.bind(41234)
+```
+
+`code\networkProgram\udpConnect.js`
+
+```js
+var dgram = require('dgram')
+var message = Buffer.from("Dear-迪丽热巴")
+var client = dgram.createSocket('udp4')
+client.send(message,0,message.length,41234,"localhost",function(){
+    client.close()
+})
+```
+
+`socket.send(msg[, offset, length][, port][, address][, callback])`
+
+msg <Buffer> | <Uint8Array> | <string> | <Array> 要发送的消息。
+offset <integer> 指定消息的开头在 buffer 中的偏移量。
+length <integer> 消息的字节数。
+port <integer> 目标端口。
+address <string> 目标主机名或 IP 地址。
+callback <Function> 当消息被发送时会被调用。
+
+send() 方法可以随意发送数据到网络中的服务器端，而TCP如果要发送数据给另一个服务器端，则需要重新通过套接字构造新的连接。
+
