@@ -621,3 +621,80 @@ Percentage of the requests served within a certain time (ms)
 Node构建的Web应用中，可以选择将页面中的动态内容和静态内容分离，静态内存预先转成Buffer，使性能提升。
 
 对于文件而言，由于文件自身是二进制数据，所以不需要改变内容的场景下，尽量只读取Buffer，然后直接传输不做额外转换。
+
+## 7.网络编程
+
+Node可以十分方便的搭建网络服务器，无需额外的容器。Node提供了net、dgram、http、https这4个模块，分别用于处理TCP、UDP、HTTP、HTTPS，适用于服务器端和客户端。
+
+### TCP服务
+
+使用node创建tcp服务端
+
+创建会话过程中，服务器端和客户端分别提供一个套接字，这两个套接字共同形成一个链接。服务器端与客户端通过套接字实现两者之间的连接操作。
+
+`code\networkProgram\tcpServer.js`
+
+```js
+var net = require('net')
+var server = net.createServer(function(socket){
+    socket.on('data',function(data){
+        console.log(data.toString())
+        socket.write('Welcome!')
+    })
+    socket.on('end',function(){
+        console.log('server disconnected')
+    })
+    socket.write('Dear-迪丽热巴:',function(){
+        console.log('写入完成')
+    })
+})
+server.listen(8124,function(){
+    console.log('server bound')
+})
+```
+
+以下是测试代码
+
+`code\networkProgram\tcpConnect.js`
+
+```js
+var net = require('net')
+var client = net.createConnection({port:8124}, function(){
+    console.log('client connected')
+    client.write('server is running')
+})
+client.on('data',function(data){
+    console.log(data.toString())
+    client.end()
+})
+client.on('end',function(){
+    console.log('client disconnected')
+})
+```
+
+启动服务端之后，向服务端发起请求，请求端输出
+
+```
+client connected
+Dear-迪丽热巴:
+Welcome!
+client disconnected
+```
+
+服务端输出
+
+```
+server bound
+写入完成
+server is running
+server disconnected
+```
+
+#### api解析
+
+socket.write  —— 在socket上发送数据
+
+data事件 —— 接收到数据的时候触发该事件。
+
+socket.on('end', function(){}) —— 半关闭 socket。 例如发送一个 FIN 包。 服务端仍可以发送数据。
+
