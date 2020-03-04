@@ -492,3 +492,132 @@ rs.on('end',function(){
 ```
 
 用一个数组存储接收到的所有Buffer片段，并记录下所有片段的总长度，然后用Buffer.concat() 生成一个合并的Buffer对象。
+
+#### Buffer与性能
+
+Buffer在文件I/O和网络I/O中运用广泛，尤其在网络传输中，它的性能举足轻重。
+
+在应用中，我们通常会操作字符串，在网络传输中，都需要转成Buffer，以二进制数据传输。
+
+Web应用中，字符串转成Buffer很常见，提高Buffer的转换效率，可以很大提高网络吞吐率。
+
+这里可以使用ApacheBench，搞个压力测试。
+
+Node代码如下，`bufferTest.js`
+
+```
+var http = require('http')
+var helloworld = ''
+for(var i=0;i < 1024 * 100;i++){
+    helloworld += '迪'
+}
+helloworld = Buffer.from(helloworld)
+http.createServer(function(req, res){
+    console.log('server is running on 8001')
+    res.writeHead(200)
+    res.end(helloworld)
+    
+}).listen(8001)
+```
+
+ApacheBench下载好之后，将`Apache Bench\Apache24\bin` 加入到环境变量，然后先启动node服务，此处 `-c` 表示200个并发客户端，`-t` 表示压测持续的时间。
+
+```
+ab -c 200 -t 100 http://127.0.0.1:8001/
+```
+
+不使用buffer ——
+
+```
+Server Software:
+Server Hostname:        127.0.0.1
+Server Port:            8001
+
+Document Path:          /
+Document Length:        307200 bytes
+
+Concurrency Level:      200
+Time taken for tests:   64.638 seconds
+Complete requests:      50000
+Failed requests:        0
+Total transferred:      15363750000 bytes
+HTML transferred:       15360000000 bytes
+Requests per second:    773.54 [#/sec] (mean)
+Time per request:       258.552 [ms] (mean)
+Time per request:       1.293 [ms] (mean, across all concurrent requests)
+Transfer rate:          232118.49 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   0.4      0       5
+Processing:    62  258  28.6    249     436
+Waiting:        8  233  24.8    228     378
+Total:         62  258  28.6    249     436
+
+Percentage of the requests served within a certain time (ms)
+  50%    249
+  66%    266
+  75%    273
+  80%    278
+  90%    293
+  95%    313
+  98%    335
+  99%    350
+ 100%    436 (longest request)
+```
+
+使用buffer ——
+
+```
+Server Software:
+Server Hostname:        127.0.0.1
+Server Port:            8001
+
+Document Path:          /
+Document Length:        307200 bytes
+
+Concurrency Level:      200
+Time taken for tests:   25.620 seconds
+Complete requests:      50000
+Failed requests:        0
+Total transferred:      15363750000 bytes
+HTML transferred:       15360000000 bytes
+Requests per second:    1951.62 [#/sec] (mean)
+Time per request:       102.479 [ms] (mean)
+Time per request:       0.512 [ms] (mean, across all concurrent requests)
+Transfer rate:          585627.74 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   0.4      0       2
+Processing:    28  102   7.9     99     138
+Waiting:        1   11  23.1      5     122
+Total:         28  102   7.9     99     138
+
+Percentage of the requests served within a certain time (ms)
+  50%     99
+  66%    103
+  75%    107
+  80%    108
+  90%    112
+  95%    118
+  98%    125
+  99%    127
+ 100%    138 (longest request)
+```
+
+对比数据 ——
+
+|                              | 未经转换        | 经过转换后       |
+| ---------------------------- | ----------- | ----------- |
+| Total transferred            | 14652M      | 14652M      |
+| HTML transferred             | 14648M      | 14648M      |
+| Requests per second(每秒查询次数)  | 773.54次（平均） | 1951.62（平均） |
+| Time per request(每次请求时长/并发数) | 1.293（ms）   | 0.512 （ms）  |
+| Transfer rate(传输速度M/s)       | 226M        | 571M        |
+
+由此可见，预先将静态内存转为Buffer对象，可以有效的减少CPU的重复使用，节省服务器资源。
+
+Node构建的Web应用中，可以选择将页面中的动态内容和静态内容分离，静态内存预先转成Buffer，使性能提升。
+
+对于文件而言，由于文件自身是二进制数据，所以不需要改变内容的场景下，尽量只读取Buffer，然后直接传输不做额外转换。
